@@ -18,7 +18,7 @@ TZDATA=`cat /etc/timezone` # Timezone for target is taken from host or defined h
 USEALLCORES=yes # Use all CPU cores for compiling
 EXIT_PATCHING_ERROR="" # exit patching if failed
 HOST="$(echo "$BOARD" | cut -f1 -d-)" # set hostname to the board
-CACHEDIR=$DEST/cache
+CACHEDIR=$SRC/cache
 ROOTFSCACHE_VERSION=3
 
 [[ -z $ROOTFS_TYPE ]] && ROOTFS_TYPE=ext4 # default rootfs type is ext4

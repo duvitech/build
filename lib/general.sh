@@ -537,7 +537,7 @@ prepare_host()
 	test -e /proc/sys/fs/binfmt_misc/qemu-aarch64 || update-binfmts --enable qemu-aarch64
 
 	# create directory structure
-	mkdir -p $SOURCES $DEST/debs/extra $DEST/debug $CACHEDIR/rootfs $SRC/userpatches/{overlay,CREATE_PATCHES} $SRC/toolchains
+	mkdir -p $SOURCES $DEST/debs/extra $DEST/debug $CACHEDIR/rootfs $SRC/userpatches/{overlay,CREATE_PATCHES} $SRC/cache/toolchains
 	find $SRC/lib/patch -type d ! -name . | sed "s%lib/patch%userpatches%" | xargs mkdir -p
 
 	# download external Linaro compiler and missing special dependencies since they are needed for certain sources
@@ -556,8 +556,8 @@ prepare_host()
 		download_toolchain "$toolchain"
 	done
 
-	rm -rf $SRC/toolchains/*.tar.xz $SRC/toolchains/*.tar.xz.asc
-	local existing_dirs=( $(ls -1 $SRC/toolchains) )
+	rm -rf $SRC/cache/toolchains/*.tar.xz $SRC/cache/toolchains/*.tar.xz.asc
+	local existing_dirs=( $(ls -1 $SRC/cache/toolchains) )
 	for dir in ${existing_dirs[@]}; do
 		local found=no
 		for toolchain in ${toolchains[@]}; do
@@ -567,7 +567,7 @@ prepare_host()
 		done
 		if [[ $found == no ]]; then
 			display_alert "Removing obsolete toolchain" "$dir"
-			rm -rf $SRC/toolchains/$dir
+			rm -rf $SRC/cache/toolchains/$dir
 		fi
 	done
 
@@ -597,11 +597,11 @@ download_toolchain()
 	local filename=${url##*/}
 	local dirname=${filename//.tar.xz}
 
-	if [[ -f $SRC/toolchains/$dirname/.download-complete ]]; then
+	if [[ -f $SRC/cache/toolchains/$dirname/.download-complete ]]; then
 		return
 	fi
 
-	cd $SRC/toolchains/
+	cd $SRC/cache/toolchains/
 
 	display_alert "Downloading" "$dirname"
 	curl -Lf --progress-bar $url -o $filename
@@ -625,7 +625,7 @@ download_toolchain()
 	fi
 	if [[ $verified == true ]]; then
 		display_alert "Extracting"
-		tar --overwrite -xf $filename && touch $SRC/toolchains/$dirname/.download-complete
+		tar --overwrite -xf $filename && touch $SRC/cache/toolchains/$dirname/.download-complete
 		display_alert "Download complete" "" "info"
 	else
 		display_alert "Verification failed" "" "wrn"
